@@ -114,13 +114,13 @@ Server.prototype.message = function(client, data) {
 
   switch(message.op) {
     case 'get':
-      res.getStatus && res.getStatus(client, message.key);
+      res.getStatus && res.getStatus(client, message);
       break;
     case 'set':
       res.setStatus && res.setStatus(client, message, message.ack || false);
       break;
     case 'sync':
-      res.sync && res.sync(client);
+      res.sync && res.sync(client, message);
       // also subscribe
     case 'subscribe':
       res.subscribe(client, message.ack || false);

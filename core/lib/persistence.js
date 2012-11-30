@@ -170,4 +170,8 @@ Persistence.handler = function(err) {
   }
 };
 
+Persistence.incrby = function(key, incr) {
+  redis().incrby(key, incr, Persistence.handler);
+};
+
 module.exports = Persistence;

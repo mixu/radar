@@ -103,26 +103,44 @@ Presence.prototype.unsubscribe = function(client, sendAck) {
   Resource.prototype.unsubscribe.call(this, client, sendAck);
 };
 
-Presence.prototype.sync = function(client) {
+Presence.prototype.sync = function(client, message) {
   var self = this;
   this.fullRead(function(online) {
-    client.send(JSON.stringify({
-      op: 'online',
-      to: self.name,
-      value: online
-    }));
+    if(message.options && message.options.version == 2) {
+      client.send(JSON.stringify({
+        op: 'get',
+        to: self.name,
+        value: self._xserver.getClientsOnline()
+      }));
+    } else {
+      // will be deprecated when syncs no longer need to use "online" to look like
+      // regular messages
+      client.send(JSON.stringify({
+        op: 'online',
+        to: self.name,
+        value: online
+      }));
+    }
   });
 };
 
 // this is a full sync of the online status from Redis
-Presence.prototype.getStatus = function(client, key) {
+Presence.prototype.getStatus = function(client, message) {
   var self = this;
   this.fullRead(function(online) {
-    client.send(JSON.stringify({
-      op: 'get',
-      to: self.name,
-      value: online
-    }));
+    if(message.options && message.options.version == 2) {
+      client.send(JSON.stringify({
+        op: 'get',
+        to: self.name,
+        value: self._xserver.getClientsOnline()
+      }));
+    } else {
+      client.send(JSON.stringify({
+        op: 'get',
+        to: self.name,
+        value: online
+      }));
+    }
   });
 };
 
